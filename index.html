@@ -275,6 +275,52 @@
         </div>
     </section>
 
+        <!-- ========== PAPAN PESAN SAM TEJO ========== -->
+    <section class="message-board">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">🎤 Papan Pesan</span>
+                <h2>Kata-Kata <span class="highlight">Hari Ini</span></h2>
+                <p>Tulis kesan, pesan, atau sekadar becandaan buat Sam Tejo</p>
+            </div>
+
+            <!-- Running Teks (Vertical Slider) -->
+            <div class="running-text-container">
+                <div class="running-icon">
+                    <i class="fas fa-comment-dots"></i>
+                    <span>Pesan terbaru:</span>
+                </div>
+                <div class="running-text" id="runningText">
+                    <div class="message-slide" id="messageSlide">
+                        <!-- Pesan akan muncul di sini via JavaScript -->
+                        <div class="loading-message">Memuat pesan...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Input Pesan -->
+            <div class="message-form-container">
+                <h3>✏️ Tulis Pesanmu</h3>
+                <form id="messageForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" id="namaPesan" placeholder="Namamu (boleh samaran)" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="isiPesan" placeholder="Tulis kata-kata hari ini..." required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-paper-plane"></i> Kirim Pesan
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div id="formStatus" class="form-status"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- ========== FOOTER ========== -->
     <footer class="footer">
         <div class="container">
