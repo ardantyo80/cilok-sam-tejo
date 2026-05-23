@@ -39,7 +39,7 @@ if (checkRadiusBtn) {
         if (distance <= 4) {
             alert('✅ Masih masuk radius antar (3-4 KM)! Lanjutkan order via WhatsApp ya!');
         } else {
-            alert('❌ Maaf, jarak Anda di luar radius antar (maksimal 4 KM). Anda bisa ambil langsung di stand atau order via Gojek/Grab.');
+            alert('❌ Maaf, jarak Anda di luar radius antar (maksimal 4 KM). Anda bisa ambil langsung di stand atau order online melalui gerai "Gehu Pedas".');
         }
     });
 }
@@ -51,7 +51,7 @@ const prevBtn = document.getElementById('prevTesti');
 const nextBtn = document.getElementById('nextTesti');
 const dotsContainer = document.getElementById('testiDots');
 
-let testiCurrentIndex = 0;  // ← UBAH: pakai nama beda biar ga konflik
+let testiCurrentIndex = 0;
 let slideInterval;
 
 function updateSlider() {
@@ -107,15 +107,16 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// ========== PAPAN PESAN SAM TEJO (SheetDB) ==========
-// GANTI DENGAN API URL DARI SHEETDB!
-const SHEETDB_API = 'https://sheetdb.io/api/v1/fkq9q7934hka9'; 
+// ========== PAPAN PESAN SAM TEJO (Google Apps Script) ==========
+const SHEETDB_API = 'https://cors-anywhere.herokuapp.com/https://script.google.com/macros/s/AKfycbyOTryrdfPE71ixcXC5NVCd086SfcJakYn2rGTcOJCx7C57WtTYGwP99YFBxGrN6rZ9/exec';
 
 // Ambil 5 pesan terbaru
 async function fetchMessages() {
     try {
-        const response = await fetch(`${SHEETDB_API}?sort=timestamp&order=desc&limit=5`);
+        const response = await fetch(SHEETDB_API);
         const messages = await response.json();
+        
+        console.log('Pesan dari API:', messages);
         
         if (messages && messages.length > 0) {
             displayMessages(messages);
@@ -127,7 +128,35 @@ async function fetchMessages() {
     } catch (error) {
         console.error('Gagal mengambil pesan:', error);
         const slideContainer = document.getElementById('messageSlide');
-        if (slideContainer) slideContainer.innerHTML = '<div class="message-item">⚠️ Gagal memuat pesan. Coba lagi nanti.</div>';
+        if (slideContainer) slideContainer.innerHTML = '<div class="message-item">⚠️ Gagal memuat pesan. Cek koneksi atau API.</div>';
+    }
+}
+
+// Kirim pesan baru ke Google Apps Script
+async function submitMessage(nama, pesan) {
+    try {
+        const response = await fetch(SHEETDB_API, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                nama: nama,
+                pesan: pesan
+            })
+        });
+        
+        const result = await response.json();
+        console.log('Hasil kirim pesan:', result);
+        
+        if (result.success === true) {
+            return { success: true };
+        } else {
+            return { success: false, error: result.error || 'Gagal mengirim' };
+        }
+    } catch (error) {
+        console.error('Error submit:', error);
+        return { success: false, error: error.message };
     }
 }
 
@@ -153,7 +182,7 @@ function displayMessages(messages) {
 }
 
 // Vertical slider (ganti pesan otomatis tiap 5 detik)
-let pesanCurrentIndex = 0;  // ← UBAH: pakai nama beda
+let pesanCurrentIndex = 0;
 let pesanSlideInterval;
 
 function startVerticalSlider(messages) {
@@ -173,33 +202,6 @@ function startVerticalSlider(messages) {
         container.style.transform = `translateY(-${index * itemHeight}px)`;
         container.style.transition = 'transform 0.5s ease-in-out';
     }, 5000);
-}
-
-// Kirim pesan baru ke SheetDB
-async function submitMessage(nama, pesan) {
-    const data = {
-        timestamp: new Date().toISOString(),
-        nama: nama,
-        pesan: pesan
-    };
-    
-    try {
-        const response = await fetch(SHEETDB_API, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        });
-        
-        if (response.ok) {
-            return { success: true };
-        } else {
-            return { success: false, error: 'Gagal mengirim pesan' };
-        }
-    } catch (error) {
-        return { success: false, error: error.message };
-    }
 }
 
 // Helper: Escape HTML biar aman dari XSS
@@ -228,7 +230,6 @@ if (messageForm) {
             return;
         }
         
-        // Disable tombol sambil mengirim
         const submitBtn = messageForm.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
@@ -240,7 +241,6 @@ if (messageForm) {
             statusDiv.innerHTML = '<span class="success">✅ Pesan terkirim! Terima kasih sudah berbagi 🙌</span>';
             namaInput.value = '';
             pesanInput.value = '';
-            // Refresh pesan setelah 2 detik
             setTimeout(() => {
                 fetchMessages();
                 statusDiv.innerHTML = '';
@@ -252,7 +252,6 @@ if (messageForm) {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
         
-        // Hilangkan status setelah 5 detik
         setTimeout(() => {
             if (statusDiv.innerHTML !== '') statusDiv.innerHTML = '';
         }, 5000);
@@ -264,4 +263,4 @@ fetchMessages();
 // Refresh pesan setiap 10 detik
 setInterval(fetchMessages, 10000);
 
-console.log('SUKSES');
+console.log('✅ CILOK SAM TEJO');
